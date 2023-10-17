@@ -1,23 +1,26 @@
-import { View, Text, ScrollView, SafeAreaView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, SafeAreaView, Pressable } from "react-native";
 import { Stack, useRouter } from "expo-router"
 import { useEffect, useState } from "react";
 import Input from "../components/Input";
 import Result from "../components/Result";
+import { Checkbox } from 'react-native-paper';
+
 
 const Home = () => {
     const [recipeInput, setRecipeInput] = useState("");
     const [ingredientMeasurements, setIngredientMeasurements] = useState(null)
+    const [isloading, setIsLoading] = useState(false)
     const [gptObj, setGptObj] = useState(
         {
             "ingredients":
             [
-                {
-                    "food": null,
-                    "quantity": {
-                        "amount": null,
-                        "unit": null
-                    }
-                }
+                // {
+                //     "food": null,
+                //     "quantity": {
+                //         "amount": null,
+                //         "unit": null
+                //     }
+                // }
             ],
             "yield": {
                 "quantity": null,
@@ -32,16 +35,39 @@ const Home = () => {
             }
         }
     );
-    const [factor, setFactor] = useState(2);
-    const router = useRouter();
-
+    const originalObj =
+        {
+            "ingredients":
+            [
+                // {
+                //     "food": null,
+                //     "quantity": {
+                //         "amount": null,
+                //         "unit": null
+                //     }
+                // }
+            ],
+            "yield": {
+                "quantity": null,
+                "units": null
+            },
+            "instructions": [
+            ],
+            "times": {
+                "prep time": null,
+                "cook time": null,
+                "total time": null
+            }
+        }
+    
+    const [factor, setFactor] = useState(1);
     const Loggy = () => {
         return(
-          <TouchableOpacity onPress={()=>{
+          <Pressable onPress={()=>{
               console.log(factor)
               }}>
             <Text>Log</Text>
-          </TouchableOpacity>
+          </Pressable>
         )
       }
 
@@ -50,24 +76,20 @@ const Home = () => {
         <SafeAreaView style={{flex: 1}}>
             <Stack.Screen
                 options={{
-                    headerLeft: ()=> (
-                        null
-                    ),
-                    headerRight: ()=>(
-                        null
-                        ),
-                    headerTitle: "",
+                    headerShown: false,
                 }}
             />
             <ScrollView showsVerticalScrollIndicator={false}>
-                <Loggy />
                 <View
                     style={{
                         flex: 1,
                     }}
                 >
-                    <Input recipeInput={recipeInput} setRecipeInput={setRecipeInput} gptObj={gptObj} setGptObj={setGptObj}/>
+                    <Input isloading={isloading} setIsLoading={setIsLoading} recipeInput={recipeInput} setRecipeInput={setRecipeInput} gptObj={gptObj} setGptObj={setGptObj}/>
+                    {
+                        JSON.stringify(gptObj) !== JSON.stringify(originalObj) && !isloading ?
                     <Result 
+                    isloading={isloading} setIsLoading={setIsLoading} 
                     recipeInput={recipeInput} 
                     setRecipeInput={setRecipeInput} 
                     gptObj={gptObj} 
@@ -77,6 +99,7 @@ const Home = () => {
                     factor={factor}
                     setFactor={setFactor}
                     />
+                    : null }
 
                 </View>
             </ScrollView>

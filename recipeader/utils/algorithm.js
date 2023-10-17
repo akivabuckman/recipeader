@@ -4,44 +4,58 @@ import OpenAIApi from "openai";
 const algorithm = async (props) => {
     // get recipe input
     if (props.recipeInput.length > 0) {
-        console.log(props.recipeInput)
-
-        // concat input to sentence for api
-
         try {
-            const sentence = `only if the following is a recipe, convert recipe to array in this format, one item per ingredient:
+            const sentence = `Convert the following recipe description into the specified JSON object format:
+
             {
-                "ingredients":
-                [
+                "ingredients": [
                     {
-                        "food": <the given food>,
+                        "food": "<food - do not include quantities>",
                         "quantity": {
-                            "amount": <given amount (examples: 3 tbsp returns 3, 4 cups returns 4)>,
-                            "unit": <unit in which the ingredient is given (cup, gr, oz, etc.)>
+                            "amount": <amount>,
+                            "unit": "<unit>"
                         }
                     }
                 ],
                 "yield": {
-                    "quantity": <qty>,
-                    "units": <servings, cookies, etc>
+                    "quantity": <yield quantity>,
+                    "units": "<yield units>"
                 },
                 "instructions": [
-                    <step 1, 2... one array item per step>
+                    "<step 1>",
+                    "<step 2>",
+                    ...
                 ],
                 "times": {
-                    "prep time": <if given>,
-                    "cook time": <if given>,
-                    "total time": <if given, or total of prep + cook>
+                    "prep time": <prep time>,
+                    "cook time": <cook time>,
+                    "total time": <total time>
                 }
             }
-            if an ingredient doesnt contain amount, leave the "amount" and "unit" as null. if it contains a unit but does not contain an amount (like "a pinch of salt"), use common sense,
-            so that would be quantity=1, unit=pinch. if there is no measurable unit (like "2 eggs"), do food=egg, amount=2, unit=null. no ingredients or units should be written in plural. do not send any explanation, just send the array as the response. include the entire description of the food, example: salted butter* (softened) should go into the "food" in its entirety ${props.recipeInput}`
             
+            - For ingredients without an amount, leave "amount" and "unit" as null.
+            - For ingredients with a unit but no amount (e.g., "a pinch of salt"), use common sense (quantity=1, unit=<unit>).
+            - For ingredients with no measurable unit (e.g., "2 eggs"), set "food" as "egg," "amount" as 2, and "unit" as null.
+            - Avoid plural units.
+            - Use the entire description of the food (e.g., "salted butter* (softened)") in the "food" field.
+            - Do not use hyphens or special characters. do not use fraction characters. only decimals
+            - If no yield is given, leave the yield values null
+            - always include all object keys, even if the values are null
+            - example for ingredients: '2¼ tbsp sugar' should return  {
+              "food": "sugar",
+              "quantity": {
+                  "amount": 2.25,
+                  "unit": "tbsp"
+              }
+          }
+            
+            use this data: ${props.recipeInput}
+            `
             // fetch api
             const options = {
                 method: "POST",
                 headers: {
-                    "Authorization": `Bearer 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`,
+                    "Authorization": `Bearer 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`,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
@@ -54,107 +68,171 @@ const algorithm = async (props) => {
             // const data = await response.json();
             // const gptString = data.choices[0]["message"]["content"];
             // console.log(gptString)
-            const gptString = JSON.stringify({
+              const gptString = JSON.stringify({
                 "ingredients": [
                     {
-                        "food": "salted butter*",
+                        "food": "flat rice noodles",
                         "quantity": {
-                            "amount": 227,
-                            "unit": "g"
+                            "amount": 8,
+                            "unit": "ounces"
                         }
                     },
                     {
-                        "food": "white (granulated) sugar",
+                        "food": "oil",
                         "quantity": {
-                            "amount": 200,
-                            "unit": "g"
+                            "amount": 3,
+                            "unit": "Tablespoons"
                         }
                     },
                     {
-                        "food": "light brown sugar packed",
+                        "food": "garlic",
                         "quantity": {
-                            "amount": 220,
-                            "unit": "g"
+                            "amount": 3,
+                            "unit": "cloves"
                         }
                     },
                     {
-                        "food": "pure vanilla extract",
+                        "food": "uncooked shrimp, chicken, or extra-firm tofu",
                         "quantity": {
-                            "amount": 2,
-                            "unit": "tsp"
+                            "amount": null,
+                            "unit": null
                         }
                     },
                     {
-                        "food": "large eggs",
+                        "food": "eggs",
+                        "quantity": {
+                            "amount": 2.3333,
+                            "unit": null
+                        }
+                    },
+                    {
+                        "food": "fresh bean sprouts",
+                        "quantity": {
+                            "amount": 1,
+                            "unit": "cup"
+                        }
+                    },
+                    {
+                        "food": "red bell pepper",
+                        "quantity": {
+                            "amount": 1,
+                            "unit": null
+                        }
+                    },
+                    {
+                        "food": "green onions",
+                        "quantity": {
+                            "amount": 3,
+                            "unit": null
+                        }
+                    },
+                    {
+                        "food": "dry roasted peanuts",
+                        "quantity": {
+                            "amount": 1/2,
+                            "unit": "cup"
+                        }
+                    },
+                    {
+                        "food": "limes",
                         "quantity": {
                             "amount": 2,
                             "unit": null
                         }
                     },
                     {
-                        "food": "all-purpose flour",
+                        "food": "Fresh cilantro",
                         "quantity": {
-                            "amount": 360,
-                            "unit": "g"
+                            "amount": 1/2,
+                            "unit": "cup"
                         }
                     },
                     {
-                        "food": "baking soda",
+                        "food": "fish sauce",
+                        "quantity": {
+                            "amount": 3,
+                            "unit": "Tablespoons"
+                        }
+                    },
+                    {
+                        "food": "low-sodium soy sauce",
                         "quantity": {
                             "amount": 1,
-                            "unit": "tsp"
+                            "unit": "Tablespoon"
                         }
                     },
                     {
-                        "food": "baking powder",
+                        "food": "light brown sugar",
                         "quantity": {
-                            "amount": 0.5,
-                            "unit": "tsp"
+                            "amount": 5,
+                            "unit": "Tablespoons"
                         }
                     },
                     {
-                        "food": "sea salt***",
+                        "food": "rice vinegar",
+                        "quantity": {
+                            "amount": 2,
+                            "unit": "Tablespoons"
+                        }
+                    },
+                    {
+                        "food": "Sriracha hot sauce",
                         "quantity": {
                             "amount": 1,
-                            "unit": "tsp"
+                            "unit": "Tablespoon"
                         }
                     },
                     {
-                        "food": "chocolate chips (or chunks, or chopped chocolate)",
+                        "food": "creamy peanut butter",
                         "quantity": {
-                            "amount": 350,
-                            "unit": "g"
+                            "amount": 2,
+                            "unit": "Tablespoons"
                         }
-                    },
+                    }
                 ],
                 "yield": {
-                    "quantity": 36,
-                    "units": "cookies"
+                    "quantity": null,
+                    "units": null
                 },
                 "instructions": [
-                    "Preheat oven to 375 degrees F. Line a baking pan with parchment paper and set aside.",
-                    "In a separate bowl mix flour, baking soda, salt, baking powder. Set aside.",
-                    "Cream together butter and sugars until combined.",
-                    "Beat in eggs and vanilla until fluffy.",
-                    "Mix in the dry ingredients until combined.",
-                    "Add 12 oz package of chocolate chips and mix well.",
-                    "Roll 2-3 TBS (depending on how large you like your cookies) of dough at a time into balls and place them evenly spaced on your prepared cookie sheets. (alternately, use a small cookie scoop to make your cookies).",
-                    "Bake in preheated oven for approximately 8-10 minutes. Take them out when they are just BARELY starting to turn brown.",
-                    "Let them sit on the baking pan for 2 minutes before removing to cooling rack."
+                    "Cook noodles according to package instructions, just until tender. Rinse under cold water.",
+                    "Make sauce by combining sauce ingredients in a bowl. Set aside.",
+                    "Stir Fry: Heat 1½ tablespoons of oil in a large saucepan or wok over medium-high heat. Add the shrimp, chicken or tofu, garlic and bell pepper. The shrimp will cook quickly, about 1-2 minutes on each side, or until pink. If using chicken, cook until just cooked through, about 3-4 minutes, flipping only once.",
+                    "Push everything to the side of the pan. Add a little more oil and add the beaten eggs. Scramble the eggs, breaking them into small pieces with a spatula as they cook.",
+                    "Add noodles, sauce, bean sprouts and peanuts to the pan (reserving some peanuts for topping at the end). Toss everything to combine.",
+                    "Garnish the top with green onions, extra peanuts, cilantro and lime wedges. Serve immediately!",
+                    "Store leftovers in the fridge and enjoy within 2-3 days."
                 ],
                 "times": {
-                    "prep time": "10 minutes",
-                    "cook time": "8 minutes",
-                    "total time": "30 minutes"
+                    "prep time": null,
+                    "cook time": null,
+                    "total time": null
                 }
             });
             const gptObj = await JSON.parse(gptString);
-            console.log(gptObj)
+
+            // handle thirds
+            if (gptObj.hasOwnProperty("ingredients")) {
+            const updatedIngredients = gptObj.ingredients.map(i => {
+                if (.66 === parseFloat((i.quantity.amount % 1).toFixed(2))) {
+                i.quantity.amount = Math.floor(i.quantity.amount) + 0.6666666;
+                } else if (.33 === parseFloat((i.quantity.amount % 1).toFixed(2))) {
+                    i.quantity.amount = Math.floor(i.quantity.amount) + 0.3333333;
+                    }
+                return i;
+            });
+            
+            const updatedGptObj = { ...gptObj, ingredients: updatedIngredients };
+            return updatedGptObj
+            }
+
             return gptObj
 
             } catch (error) {
                 console.log(error)
             };
+        } else {
+          null
         }
     }
 export default algorithm;

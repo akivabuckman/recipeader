@@ -7,19 +7,14 @@ const quantityCalculator = (props) => {
         "ounce": 28.3495, "oz": 28.3495, "pound": 453.592, "lb": 453.592, "gram": 1, "gr": 1, "g": 1, "miligram": 0.001, "milligram": 0.001, "mg": 0.001, "kilo": 1000, "kilogram": 1000, "kg": 1000,
     };
 
-    if (props.gptObj) {
-        
-      });
-      console.log(a)
-
-    }
-    
-
-      
-      
-    
-
-
 }
+    
+
+      
+      
+    
+
+
+
 
 export default quantityCalculator
